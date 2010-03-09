@@ -9,7 +9,7 @@ FILES
 bitarray.cpp    - Class providing operations on arbitrary length arrays
                   of bits.
 bitarray.h      - Header for bitarray class.
-sample.cpp      - Program demonstrating how to use the bitarray class. 
+sample.cpp      - Program demonstrating how to use the bitarray class.
 COPYING         - GNU General Public License
 COPYING.LESSER  - GNU Lesser General Public License
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
@@ -35,6 +35,9 @@ HISTORY
            All assignment operators return a reference to the object being
            assigned a value so that operator chaining will work.
            Add >> and << operators.
+02/03/10 - Replaced vector<unsigned char> with an array of unsigned char.
+           If you want to use STL and vector you might as well use
+           vector<bool>.  Nothing from STL is used in this version.
 
 TODO
 ----
@@ -43,4 +46,4 @@ TODO
 
 AUTHOR
 ------
-Michael Dipperstein (mdipper@cs.ucsb.edu)
+Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)

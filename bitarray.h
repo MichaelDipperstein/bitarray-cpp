@@ -10,8 +10,13 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.h,v 1.4 2007/08/06 05:23:12 michael Exp $
+*   $Id: bitarray.h,v 1.5 2010/02/04 03:31:43 michael Exp $
 *   $Log: bitarray.h,v $
+*   Revision 1.5  2010/02/04 03:31:43  michael
+*   Replaced vector<unsigned char> with an array of unsigned char.
+*
+*   Made updates for GCC 4.4.
+*
 *   Revision 1.4  2007/08/06 05:23:12  michael
 *   Updated for LGPL Version 3.
 *
@@ -36,7 +41,8 @@
 ****************************************************************************
 *
 * Bitarray: An ANSI C++ class for manipulating arbitrary length bit arrays
-* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007, 2010 by
+*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of the bit array library.
 *
@@ -60,7 +66,6 @@
 /***************************************************************************
 *                             INCLUDED FILES
 ***************************************************************************/
-#include <vector>
 #include <ostream>
 
 /***************************************************************************
@@ -85,8 +90,7 @@ class bit_array_c
 {
     public:
         bit_array_c(const int numBits);
-        bit_array_c(const std::vector<unsigned char> &vect,
-            const int numBits);
+        bit_array_c(unsigned char *array, const int numBits);
 
         virtual ~bit_array_c(void);
 
@@ -139,7 +143,7 @@ class bit_array_c
 
     protected:
         unsigned int m_NumBits;                 /* number of bits in the array */
-        std::vector<unsigned char> m_Array;     /* vector of characters */
+        unsigned char *m_Array;                 /* vector of characters */
 };
 
 #endif  /* ndef BIT_ARRAY_H */

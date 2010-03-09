@@ -9,8 +9,13 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.4 2007/08/06 05:21:00 michael Exp $
+*   $Id: sample.cpp,v 1.6 2010/02/04 03:31:43 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.6  2010/02/04 03:31:43  michael
+*   Replaced vector<unsigned char> with an array of unsigned char.
+*
+*   Made updates for GCC 4.4.
+*
 *   Revision 1.4  2007/08/06 05:21:00  michael
 *   Updated for LGPL Version 3.
 *   Verifies new >> and << functions.
@@ -25,7 +30,8 @@
 ****************************************************************************
 *
 * Sample: A bit array class sample usage program
-* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007, 2010 by
+*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of the bit array library.
 *
@@ -45,6 +51,8 @@
 ***************************************************************************/
 
 #include <iostream>
+#include <cstdlib>
+#include <climits>
 #include "bitarray.h"
 
 using namespace std;
@@ -67,7 +75,7 @@ using namespace std;
 *   Effects    : Writes array to stdout.
 *   Returned   : None
 ***************************************************************************/
-void ShowArray(char *name, bit_array_c *ba)
+void ShowArray(const char *name, bit_array_c *ba)
 {
     cout << name << ": ";
     ba->Dump(cout);
@@ -357,8 +365,9 @@ int main(int argc, char *argv[])
         cout << "ba2 < ba1" << endl;
     }
 
-    /* test construction from vector: create a vector, fill it with values */
-    vector<unsigned char> vect(NUM_BITS / CHAR_BIT);
+    /* test construction from existing: create an array, fill it with values */
+    unsigned char* vect;
+    vect = new unsigned char[(NUM_BITS / CHAR_BIT)];
 
     vect[0] = 0x00;
     for (i = 1; i < NUM_BITS / CHAR_BIT; i++)
@@ -366,7 +375,7 @@ int main(int argc, char *argv[])
         vect[i] = vect[i -1] + 0x11;
     }
 
-    cout << endl << "construct array from vector" << endl;
+    cout << endl << "construct a bit array from existing array" << endl;
     bit_array_c ba3(vect, NUM_BITS);
     ShowArray("ba3", &ba3);
 

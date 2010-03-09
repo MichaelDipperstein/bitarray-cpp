@@ -26,8 +26,13 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.cpp,v 1.5 2007/08/06 05:23:29 michael Exp $
+*   $Id: bitarray.cpp,v 1.7 2010/02/04 03:31:43 michael Exp $
 *   $Log: bitarray.cpp,v $
+*   Revision 1.7  2010/02/04 03:31:43  michael
+*   Replaced vector<unsigned char> with an array of unsigned char.
+*
+*   Made updates for GCC 4.4.
+*
 *   Revision 1.5  2007/08/06 05:23:29  michael
 *   Updated for LGPL Version 3.
 *
@@ -52,7 +57,8 @@
 ****************************************************************************
 *
 * Bitarray: An ANSI C++ class for manipulating arbitrary length bit arrays
-* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007, 2010 by
+*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
 *
 * This file is part of the bit array library.
 *
@@ -75,6 +81,7 @@
 *                             INCLUDED FILES
 ***************************************************************************/
 #include <iostream>
+#include <climits>
 #include "bitarray.h"
 
 using namespace std;
@@ -116,14 +123,15 @@ using namespace std;
 bit_array_c::bit_array_c(const int numBits):
     m_NumBits(numBits)
 {
-    /* allocate space for bit array */
-    m_Array.reserve(BITS_TO_CHARS(numBits));
+    int numBytes;
 
-    /* insert unsigned chars of 0 */
-    for(int i = 0; i < BITS_TO_CHARS(numBits); ++i)
-    {
-        m_Array.push_back(0);
-    }
+    numBytes = BITS_TO_CHARS(numBits);
+
+    /* allocate space for bit array */
+    m_Array = new unsigned char[numBytes];
+
+    /* set all bits to 0 */
+    fill_n(m_Array, numBytes, 0);
 }
 
 /***************************************************************************
@@ -136,10 +144,9 @@ bit_array_c::bit_array_c(const int numBits):
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-bit_array_c::bit_array_c(const std::vector<unsigned char> &vect,
-    const int numBits):
+bit_array_c::bit_array_c(unsigned char *array, const int numBits):
     m_NumBits(numBits),
-    m_Array(vect)
+    m_Array(array)
 {
 }
 
@@ -153,7 +160,7 @@ bit_array_c::bit_array_c(const std::vector<unsigned char> &vect,
 ***************************************************************************/
 bit_array_c::~bit_array_c(void)
 {
-    /* I think std::vector destructor will automatically delete m_Array */
+    delete[] m_Array;
 }
 
 /***************************************************************************
@@ -167,11 +174,15 @@ bit_array_c::~bit_array_c(void)
 ***************************************************************************/
 void bit_array_c::Dump(std::ostream &outStream)
 {
+    int size;
+
+    size = BITS_TO_CHARS(m_NumBits);
+
     outStream.width(2);
     outStream.fill('0');
     outStream << uppercase << hex << (int)(m_Array[0]);  /* first byte */
 
-    for (unsigned int i = 1; i < m_Array.size(); i++)
+    for (int i = 1; i < size; i++)
     {
         /* remaining bytes with a leading space */
         outStream << " ";
@@ -197,11 +208,13 @@ void bit_array_c::Dump(std::ostream &outStream)
 ***************************************************************************/
 void bit_array_c::SetAll(void)
 {
-    int bits;
+    int bits, size;
     unsigned char mask;
 
+    size = BITS_TO_CHARS(m_NumBits);
+
     /* set bits in all bytes to 1 */
-    m_Array.assign(m_Array.size(), UCHAR_MAX);
+    fill_n(m_Array, size, UCHAR_MAX);
 
     /* zero any spare bits so increment and decrement are consistent */
     bits = m_NumBits % CHAR_BIT;
@@ -221,8 +234,12 @@ void bit_array_c::SetAll(void)
 ***************************************************************************/
 void bit_array_c::ClearAll(void)
 {
+    int size;
+
+    size = BITS_TO_CHARS(m_NumBits);
+
     /* set bits in all bytes to 0 */
-    m_Array.assign(m_Array.size(), 0);
+    fill_n(m_Array, size, 0);
 }
 
 /***************************************************************************
@@ -413,7 +430,8 @@ bool bit_array_c::operator>=(const bit_array_c &other) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator~(void) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result.Not();
 
     return result;
@@ -429,7 +447,8 @@ bit_array_c bit_array_c::operator~(void) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator&(const bit_array_c &other) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result &= other;
 
     return result;
@@ -446,7 +465,8 @@ bit_array_c bit_array_c::operator&(const bit_array_c &other) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator^(const bit_array_c &other) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result ^= other;
 
     return result;
@@ -462,7 +482,8 @@ bit_array_c bit_array_c::operator^(const bit_array_c &other) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator|(const bit_array_c &other) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result |= other;
 
     return result;
@@ -478,7 +499,8 @@ bit_array_c bit_array_c::operator|(const bit_array_c &other) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator<<(const unsigned int count) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result <<= count;
 
     return result;
@@ -494,7 +516,8 @@ bit_array_c bit_array_c::operator<<(const unsigned int count) const
 ***************************************************************************/
 bit_array_c bit_array_c::operator>>(const unsigned int count) const
 {
-    bit_array_c result(this->m_Array, this->m_NumBits);
+    bit_array_c result(this->m_NumBits);
+    result = *this;
     result >>= count;
 
     return result;
@@ -514,7 +537,7 @@ bit_array_c& bit_array_c::operator++(void)
     unsigned char maxValue;     /* maximum value for current char */
     unsigned char one;          /* least significant bit in current char */
 
-    if (m_Array.size() == 0)
+    if (m_NumBits == 0)
     {
         return *this;           /* nothing to increment */
     }
@@ -581,7 +604,7 @@ bit_array_c& bit_array_c::operator--(void)
     unsigned char maxValue;     /* maximum value for current char */
     unsigned char one;          /* least significant bit in current char */
 
-    if (m_Array.size() == 0)
+    if (m_NumBits == 0)
     {
         return *this;           /* nothing to decrement */
     }
@@ -656,14 +679,17 @@ bit_array_c& bit_array_c::operator=(const bit_array_c &src)
         return *this;
     }
 
-    if ((m_Array.size() == 0) || (src.m_Array.size() == 0))
+    if ((m_NumBits == 0) || (src.m_NumBits == 0))
     {
         /* don't do assignment with unallocated array */
         return *this;
     }
 
     /* copy bits from source */
-    this->m_Array = src.m_Array;
+    int size;
+    size = BITS_TO_CHARS(m_NumBits);
+
+    copy(src.m_Array, &src.m_Array[size], this->m_Array);
     return *this;
 }
 
@@ -678,6 +704,10 @@ bit_array_c& bit_array_c::operator=(const bit_array_c &src)
 ***************************************************************************/
 bit_array_c& bit_array_c::operator&=(const bit_array_c &src)
 {
+    int size;
+
+    size = BITS_TO_CHARS(m_NumBits);
+
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
@@ -685,7 +715,7 @@ bit_array_c& bit_array_c::operator&=(const bit_array_c &src)
     }
 
     /* AND array one unsigned char at a time */
-    for(unsigned int i = 0; i < m_Array.size(); i++)
+    for(int i = 0; i < size; i++)
     {
         m_Array[i] = m_Array[i] & src.m_Array[i];
     }
@@ -704,6 +734,10 @@ bit_array_c& bit_array_c::operator&=(const bit_array_c &src)
 ***************************************************************************/
 bit_array_c& bit_array_c::operator^=(const bit_array_c &src)
 {
+    int size;
+
+    size = BITS_TO_CHARS(m_NumBits);
+
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
@@ -711,7 +745,7 @@ bit_array_c& bit_array_c::operator^=(const bit_array_c &src)
     }
 
     /* XOR array one unsigned char at a time */
-    for(unsigned int i = 0; i < m_Array.size(); i++)
+    for(int i = 0; i < size; i++)
     {
         m_Array[i] = m_Array[i] ^ src.m_Array[i];
     }
@@ -730,6 +764,10 @@ bit_array_c& bit_array_c::operator^=(const bit_array_c &src)
 ***************************************************************************/
 bit_array_c& bit_array_c::operator|=(const bit_array_c &src)
 {
+    int size;
+
+    size = BITS_TO_CHARS(m_NumBits);
+
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
@@ -737,7 +775,7 @@ bit_array_c& bit_array_c::operator|=(const bit_array_c &src)
     }
 
     /* OR array one unsigned char at a time */
-    for(unsigned int i = 0; i < m_Array.size(); i++)
+    for(int i = 0; i < size; i++)
     {
         m_Array[i] = m_Array[i] | src.m_Array[i];
     }
@@ -757,15 +795,18 @@ bit_array_c& bit_array_c::Not(void)
 {
     int bits;
     unsigned char mask;
+    int size;
 
-    if (m_Array.size() == 0)
+    size = BITS_TO_CHARS(m_NumBits);
+
+    if (m_NumBits == 0)
     {
         /* don't do not with unallocated array */
         return *this;
     }
 
     /* NOT array one unsigned char at a time */
-    for(unsigned int i = 0; i < m_Array.size(); i++)
+    for(int i = 0; i < size; i++)
     {
         m_Array[i] = ~m_Array[i];
     }
@@ -791,7 +832,7 @@ bit_array_c& bit_array_c::Not(void)
 ***************************************************************************/
 bit_array_c& bit_array_c::operator<<=(const unsigned int shifts)
 {
-    unsigned int i;
+    int i;
     int chars = shifts / CHAR_BIT; /* number of whole byte shifts */
 
     if (shifts >= m_NumBits)
@@ -804,13 +845,17 @@ bit_array_c& bit_array_c::operator<<=(const unsigned int shifts)
     /* first handle big jumps of bytes */
     if (chars > 0)
     {
-        for (i = 0; (i + chars) < m_Array.size(); i++)
+        int size;
+
+        size = BITS_TO_CHARS(m_NumBits);
+
+        for (i = 0; (i + chars) < size; i++)
         {
             m_Array[i] = m_Array[i + chars];
         }
 
         /* now zero out new bytes on the right */
-        for (i = m_Array.size(); chars > 0; chars--)
+        for (i = size; chars > 0; chars--)
         {
             m_Array[i - chars] = 0;
         }
