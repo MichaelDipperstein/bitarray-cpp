@@ -10,8 +10,12 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.h,v 1.2 2004/08/05 22:17:04 michael Exp $
+*   $Id: bitarray.h,v 1.3 2006/04/30 23:34:07 michael Exp $
 *   $Log: bitarray.h,v $
+*   Revision 1.3  2006/04/30 23:34:07  michael
+*   Improved performance by incorporating Benjamin Schindler's
+*   <bschindler@student.ethz.ch> changes to pass arguments as a reference.
+*
 *   Revision 1.2  2004/08/05 22:17:04  michael
 *   Add overloads for bitwise operators returning values.
 *   Add a more natural looking way to set bit values.
@@ -70,7 +74,7 @@ class bit_array_c
 {
     public:
         bit_array_c(int numBits);
-        bit_array_c(const std::vector<unsigned char> vect, int numBits);
+        bit_array_c(const std::vector<unsigned char> &vect, int numBits);
 
         virtual ~bit_array_c(void);
 
@@ -88,17 +92,17 @@ class bit_array_c
 
         /* boolean operator */
         bool operator[](unsigned int bit);
-        bool operator==(bit_array_c other);
-        bool operator!=(bit_array_c other);
-        bool operator<(bit_array_c other);
-        bool operator<=(bit_array_c other);
-        bool operator>(bit_array_c other);
-        bool operator>=(bit_array_c other);
+        bool operator==(const bit_array_c &other);
+        bool operator!=(const bit_array_c &other);
+        bool operator<(const bit_array_c &other);
+        bool operator<=(const bit_array_c &other);
+        bool operator>(const bit_array_c &other);
+        bool operator>=(const bit_array_c &other);
 
         /* bitwise operators */
-        bit_array_c operator&(bit_array_c other);
-        bit_array_c operator^(bit_array_c other);
-        bit_array_c operator|(bit_array_c other);
+        bit_array_c operator&(const bit_array_c &other);
+        bit_array_c operator^(const bit_array_c &other);
+        bit_array_c operator|(const bit_array_c &other);
         bit_array_c operator~(void);
 
         /* increment/decrement */
@@ -108,11 +112,11 @@ class bit_array_c
         void operator--(int dummy);     /* postfix */
 
         /* assignments */
-        void operator=(bit_array_c src);
+        void operator=(const bit_array_c &src);
 
-        void operator&=(bit_array_c src);
-        void operator^=(bit_array_c src);
-        void operator|=(bit_array_c src);
+        void operator&=(const bit_array_c &src);
+        void operator^=(const bit_array_c &src);
+        void operator|=(const bit_array_c &src);
         void Not(void);                 /* negate (~=) */
 
         void operator<<=(unsigned int shifts);

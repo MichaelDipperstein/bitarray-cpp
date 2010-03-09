@@ -26,6 +26,9 @@ sample.cpp demonstrates usage of each of the bitarray functions.
 HISTORY
 -------
 08/03/04 - Initial release
+04/30/06 - Improved performance by incorporating Benjamin Schindler's
+           <bschindler@student.ethz.ch> changes to pass arguments as a
+           reference.
 
 TODO
 ----

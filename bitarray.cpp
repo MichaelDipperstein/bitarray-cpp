@@ -26,8 +26,12 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.cpp,v 1.2 2004/08/05 22:16:49 michael Exp $
+*   $Id: bitarray.cpp,v 1.3 2006/04/30 23:34:07 michael Exp $
 *   $Log: bitarray.cpp,v $
+*   Revision 1.3  2006/04/30 23:34:07  michael
+*   Improved performance by incorporating Benjamin Schindler's
+*   <bschindler@student.ethz.ch> changes to pass arguments as a reference.
+*
 *   Revision 1.2  2004/08/05 22:16:49  michael
 *   Add overloads for bitwise operators returning values.
 *   Add a more natural looking way to set bit values.
@@ -121,7 +125,7 @@ bit_array_c::bit_array_c(int numBits)
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-bit_array_c::bit_array_c(const std::vector<unsigned char> vect, int numBits)
+bit_array_c::bit_array_c(const std::vector<unsigned char> &vect, int numBits)
 {
     m_Array = vect;
     m_NumBits = numBits;
@@ -286,7 +290,7 @@ bool bit_array_c::operator[](unsigned int bit)
 *   Effects    : None
 *   Returned   : True if this == other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator==(bit_array_c other)
+bool bit_array_c::operator==(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -304,7 +308,7 @@ bool bit_array_c::operator==(bit_array_c other)
 *   Effects    : None
 *   Returned   : True if this != other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator!=(bit_array_c other)
+bool bit_array_c::operator!=(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -322,7 +326,7 @@ bool bit_array_c::operator!=(bit_array_c other)
 *   Effects    : None
 *   Returned   : True if this < other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator<(bit_array_c other)
+bool bit_array_c::operator<(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -340,7 +344,7 @@ bool bit_array_c::operator<(bit_array_c other)
 *   Effects    : None
 *   Returned   : True if this <= other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator<=(bit_array_c other)
+bool bit_array_c::operator<=(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -358,7 +362,7 @@ bool bit_array_c::operator<=(bit_array_c other)
 *   Effects    : None
 *   Returned   : True if this > other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator>(bit_array_c other)
+bool bit_array_c::operator>(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -376,7 +380,7 @@ bool bit_array_c::operator>(bit_array_c other)
 *   Effects    : None
 *   Returned   : True if this >= other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator>=(bit_array_c other)
+bool bit_array_c::operator>=(const bit_array_c &other)
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -411,7 +415,7 @@ bit_array_c bit_array_c::operator~(void)
 *   Effects    : None
 *   Returned   : value of bitwise and of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator&(bit_array_c other)
+bit_array_c bit_array_c::operator&(const bit_array_c &other)
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result &= other;
@@ -428,7 +432,7 @@ bit_array_c bit_array_c::operator&(bit_array_c other)
 *   Effects    : None
 *   Returned   : value of bitwise xor of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator^(bit_array_c other)
+bit_array_c bit_array_c::operator^(const bit_array_c &other)
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result ^= other;
@@ -444,7 +448,7 @@ bit_array_c bit_array_c::operator^(bit_array_c other)
 *   Effects    : None
 *   Returned   : value of bitwise or of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator|(bit_array_c other)
+bit_array_c bit_array_c::operator|(const bit_array_c &other)
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result |= other;
@@ -588,7 +592,7 @@ void bit_array_c::operator--(int dummy)
 *   Effects    : Source bit array contents are copied into this array
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator=(bit_array_c src)
+void bit_array_c::operator=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
@@ -615,7 +619,7 @@ void bit_array_c::operator=(bit_array_c src)
 *   Effects    : Results of bitwise and are stored in this array
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator&=(bit_array_c src)
+void bit_array_c::operator&=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
@@ -639,7 +643,7 @@ void bit_array_c::operator&=(bit_array_c src)
 *   Effects    : Results of bitwise not are stored in this array
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator^=(bit_array_c src)
+void bit_array_c::operator^=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
@@ -663,7 +667,7 @@ void bit_array_c::operator^=(bit_array_c src)
 *   Effects    : Results of bitwise or are stored in this array
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator|=(bit_array_c src)
+void bit_array_c::operator|=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
