@@ -1,8 +1,11 @@
 ############################################################################
 # Makefile for bitarray class library and sample
 #
-#   $Id: Makefile,v 1.1.1.1 2004/08/04 13:28:20 michael Exp $
+#   $Id: Makefile,v 1.2 2007/07/16 02:00:19 michael Exp $
 #   $Log: Makefile,v $
+#   Revision 1.2  2007/07/16 02:00:19  michael
+#   Use -pedantic option when compiling.
+#
 #   Revision 1.1.1.1  2004/08/04 13:28:20  michael
 #   bit_array_c
 #
@@ -10,7 +13,7 @@
 
 CPP = g++
 LD = g++
-CPPFLAGS = -O2 -Wall -c
+CPPFLAGS = -O2 -Wall -pedantic -c
 LDFLAGS = -O2 -o
 
 # Treat NT and non-NT windows the same

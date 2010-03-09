@@ -10,7 +10,8 @@ bitarray.cpp    - Class providing operations on arbitrary length arrays
                   of bits.
 bitarray.h      - Header for bitarray class.
 sample.cpp      - Program demonstrating how to use the bitarray class. 
-LICENSE         - GNU Lesser General Public License
+COPYING         - GNU General Public License
+COPYING.LESSER  - GNU Lesser General Public License
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
 README          - this file
 
@@ -29,11 +30,16 @@ HISTORY
 04/30/06 - Improved performance by incorporating Benjamin Schindler's
            <bschindler@student.ethz.ch> changes to pass arguments as a
            reference.
+08/02/07 - All methods that don't modify object have been made const to
+           increase functionality of const bit_array_c.
+           All assignment operators return a reference to the object being
+           assigned a value so that operator chaining will work.
+           Add >> and << operators.
 
 TODO
 ----
 - Test on platforms with character lengths other than 8 bits.
-- Consider implementing overloads that return cont bit_array_c
+- Consider implementing overloads that return const bit_array_c
 
 AUTHOR
 ------

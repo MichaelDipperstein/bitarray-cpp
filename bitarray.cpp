@@ -26,8 +26,18 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.cpp,v 1.3 2006/04/30 23:34:07 michael Exp $
+*   $Id: bitarray.cpp,v 1.5 2007/08/06 05:23:29 michael Exp $
 *   $Log: bitarray.cpp,v $
+*   Revision 1.5  2007/08/06 05:23:29  michael
+*   Updated for LGPL Version 3.
+*
+*   All methods that don't modify object have been made
+*   const to increase functionality of const bit_array_c.
+*
+*   All assignment operators return a reference to the object being assigned a value so that operator chaining will work.
+*
+*   Added >> and << operators.
+*
 *   Revision 1.3  2006/04/30 23:34:07  michael
 *   Improved performance by incorporating Benjamin Schindler's
 *   <bschindler@student.ethz.ch> changes to pass arguments as a reference.
@@ -42,21 +52,22 @@
 ****************************************************************************
 *
 * Bitarray: An ANSI C++ class for manipulating arbitrary length bit arrays
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit array library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit array library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit array library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -102,7 +113,8 @@ using namespace std;
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-bit_array_c::bit_array_c(int numBits)
+bit_array_c::bit_array_c(const int numBits):
+    m_NumBits(numBits)
 {
     /* allocate space for bit array */
     m_Array.reserve(BITS_TO_CHARS(numBits));
@@ -112,7 +124,6 @@ bit_array_c::bit_array_c(int numBits)
     {
         m_Array.push_back(0);
     }
-    m_NumBits = numBits;
 }
 
 /***************************************************************************
@@ -125,10 +136,11 @@ bit_array_c::bit_array_c(int numBits)
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-bit_array_c::bit_array_c(const std::vector<unsigned char> &vect, int numBits)
+bit_array_c::bit_array_c(const std::vector<unsigned char> &vect,
+    const int numBits):
+    m_NumBits(numBits),
+    m_Array(vect)
 {
-    m_Array = vect;
-    m_NumBits = numBits;
 }
 
 /***************************************************************************
@@ -220,7 +232,7 @@ void bit_array_c::ClearAll(void)
 *   Effects    : The specified bit will be set to 1.
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::SetBit(unsigned int bit)
+void bit_array_c::SetBit(const unsigned int bit)
 {
     if (m_NumBits <= bit)
     {
@@ -237,7 +249,7 @@ void bit_array_c::SetBit(unsigned int bit)
 *   Effects    : The specified bit will be set to 0.
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::ClearBit(unsigned int bit)
+void bit_array_c::ClearBit(const unsigned int bit)
 {
     unsigned char mask;
 
@@ -263,7 +275,7 @@ void bit_array_c::ClearBit(unsigned int bit)
 *   Effects    : None
 *   Returned   : bit_array_index_c (pointer to bit)
 ***************************************************************************/
-bit_array_index_c bit_array_c::operator()(unsigned int bit)
+bit_array_index_c bit_array_c::operator()(const unsigned int bit)
 {
     bit_array_index_c result(this, bit);
 
@@ -278,7 +290,7 @@ bit_array_index_c bit_array_c::operator()(unsigned int bit)
 *   Effects    : None
 *   Returned   : The value of the specified bit.
 ***************************************************************************/
-bool bit_array_c::operator[](unsigned int bit)
+bool bit_array_c::operator[](const unsigned int bit) const
 {
     return((m_Array[BIT_CHAR(bit)] & BIT_IN_CHAR(bit)) != 0);
 }
@@ -290,7 +302,7 @@ bool bit_array_c::operator[](unsigned int bit)
 *   Effects    : None
 *   Returned   : True if this == other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator==(const bit_array_c &other)
+bool bit_array_c::operator==(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -308,7 +320,7 @@ bool bit_array_c::operator==(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : True if this != other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator!=(const bit_array_c &other)
+bool bit_array_c::operator!=(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -326,7 +338,7 @@ bool bit_array_c::operator!=(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : True if this < other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator<(const bit_array_c &other)
+bool bit_array_c::operator<(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -344,7 +356,7 @@ bool bit_array_c::operator<(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : True if this <= other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator<=(const bit_array_c &other)
+bool bit_array_c::operator<=(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -362,7 +374,7 @@ bool bit_array_c::operator<=(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : True if this > other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator>(const bit_array_c &other)
+bool bit_array_c::operator>(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -380,7 +392,7 @@ bool bit_array_c::operator>(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : True if this >= other.  Otherwise false.
 ***************************************************************************/
-bool bit_array_c::operator>=(const bit_array_c &other)
+bool bit_array_c::operator>=(const bit_array_c &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -399,7 +411,7 @@ bool bit_array_c::operator>=(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : value of this after bitwise not
 ***************************************************************************/
-bit_array_c bit_array_c::operator~(void)
+bit_array_c bit_array_c::operator~(void) const
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result.Not();
@@ -415,7 +427,7 @@ bit_array_c bit_array_c::operator~(void)
 *   Effects    : None
 *   Returned   : value of bitwise and of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator&(const bit_array_c &other)
+bit_array_c bit_array_c::operator&(const bit_array_c &other) const
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result &= other;
@@ -432,7 +444,7 @@ bit_array_c bit_array_c::operator&(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : value of bitwise xor of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator^(const bit_array_c &other)
+bit_array_c bit_array_c::operator^(const bit_array_c &other) const
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result ^= other;
@@ -448,10 +460,42 @@ bit_array_c bit_array_c::operator^(const bit_array_c &other)
 *   Effects    : None
 *   Returned   : value of bitwise or of this and other.
 ***************************************************************************/
-bit_array_c bit_array_c::operator|(const bit_array_c &other)
+bit_array_c bit_array_c::operator|(const bit_array_c &other) const
 {
     bit_array_c result(this->m_Array, this->m_NumBits);
     result |= other;
+
+    return result;
+}
+
+/***************************************************************************
+*   Method     : operator<<
+*   Description: overload of the << operator.  Performs a bitwise left
+*                shift of this bit array.
+*   Parameters : count - the number of bits to shift left
+*   Effects    : None
+*   Returned   : result of bitwise left shift
+***************************************************************************/
+bit_array_c bit_array_c::operator<<(const unsigned int count) const
+{
+    bit_array_c result(this->m_Array, this->m_NumBits);
+    result <<= count;
+
+    return result;
+}
+
+/***************************************************************************
+*   Method     : operator>>
+*   Description: overload of the >> operator.  Performs a bitwise right
+*                shift of this bit array.
+*   Parameters : count - the number of bits to shift right
+*   Effects    : None
+*   Returned   : result of bitwise right shift
+***************************************************************************/
+bit_array_c bit_array_c::operator>>(const unsigned int count) const
+{
+    bit_array_c result(this->m_Array, this->m_NumBits);
+    result >>= count;
 
     return result;
 }
@@ -462,9 +506,9 @@ bit_array_c bit_array_c::operator|(const bit_array_c &other)
 *                a bit array.  Overflows cause rollover.
 *   Parameters : None
 *   Effects    : Bit array contents are incremented
-*   Returned   : None
+*   Returned   : Reference to this array after increment
 ***************************************************************************/
-void bit_array_c::operator++(void)
+bit_array_c& bit_array_c::operator++(void)
 {
     int i;
     unsigned char maxValue;     /* maximum value for current char */
@@ -472,7 +516,7 @@ void bit_array_c::operator++(void)
 
     if (m_Array.size() == 0)
     {
-        return;         /* nothing to increment */
+        return *this;           /* nothing to increment */
     }
 
     /* handle arrays that don't use every bit in the last character */
@@ -493,7 +537,7 @@ void bit_array_c::operator++(void)
         if (m_Array[i] != maxValue)
         {
             m_Array[i] = m_Array[i] + one;
-            return;
+            return *this;
         }
         else
         {
@@ -505,6 +549,8 @@ void bit_array_c::operator++(void)
             one = 1;
         }
     }
+
+    return *this;
 }
 
 /***************************************************************************
@@ -513,11 +559,12 @@ void bit_array_c::operator++(void)
 *                a bit array.  Overflows cause rollover.
 *   Parameters : dumy - needed for postfix increment
 *   Effects    : Bit array contents are incremented
-*   Returned   : None
+*   Returned   : Reference to this array after increment
 ***************************************************************************/
-void bit_array_c::operator++(int dummy)
+bit_array_c& bit_array_c::operator++(int dummy)
 {
     ++(*this);
+    return *this;
 }
 
 /***************************************************************************
@@ -528,7 +575,7 @@ void bit_array_c::operator++(int dummy)
 *   Effects    : Bit array contents are decremented
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator--(void)
+bit_array_c& bit_array_c::operator--(void)
 {
     int i;
     unsigned char maxValue;     /* maximum value for current char */
@@ -536,7 +583,7 @@ void bit_array_c::operator--(void)
 
     if (m_Array.size() == 0)
     {
-        return;         /* nothing to decrement */
+        return *this;           /* nothing to decrement */
     }
 
     /* handle arrays that don't use every bit in the last character */
@@ -557,7 +604,7 @@ void bit_array_c::operator--(void)
         if (m_Array[i] >= one)
         {
             m_Array[i] = m_Array[i] - one;
-            return;
+            return *this;
         }
         else
         {
@@ -569,6 +616,8 @@ void bit_array_c::operator--(void)
             one = 1;
         }
     }
+
+    return *this;
 }
 
 /***************************************************************************
@@ -579,9 +628,10 @@ void bit_array_c::operator--(void)
 *   Effects    : Bit array contents are decremented
 *   Returned   : None
 ***************************************************************************/
-void bit_array_c::operator--(int dummy)
+bit_array_c& bit_array_c::operator--(int dummy)
 {
     --(*this);
+    return *this;
 }
 
 /***************************************************************************
@@ -590,41 +640,48 @@ void bit_array_c::operator--(int dummy)
 *                this bit array.
 *   Parameters : src - Source bit array
 *   Effects    : Source bit array contents are copied into this array
-*   Returned   : None
+*   Returned   : Reference to this array after copy
 ***************************************************************************/
-void bit_array_c::operator=(const bit_array_c &src)
+bit_array_c& bit_array_c::operator=(const bit_array_c &src)
 {
+    if (*this == src)
+    {
+        /* don't do anything for a self assignment */
+        return *this;
+    }
+
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
-        return;
+        return *this;
     }
 
     if ((m_Array.size() == 0) || (src.m_Array.size() == 0))
     {
         /* don't do assignment with unallocated array */
-        return;
+        return *this;
     }
 
     /* copy bits from source */
     this->m_Array = src.m_Array;
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : operator&=
 *   Description: overload of the &= operator.  Performs a bitwise and
-*                between the source array and this bit array.  Contents of
-*                this bit array will be the result.
+*                between the source array and this bit array.  This bit
+*                array will contain the result.
 *   Parameters : src - Source bit array
 *   Effects    : Results of bitwise and are stored in this array
-*   Returned   : None
+*   Returned   : Reference to this array after and
 ***************************************************************************/
-void bit_array_c::operator&=(const bit_array_c &src)
+bit_array_c& bit_array_c::operator&=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
-        return;
+        return *this;
     }
 
     /* AND array one unsigned char at a time */
@@ -632,23 +689,25 @@ void bit_array_c::operator&=(const bit_array_c &src)
     {
         m_Array[i] = m_Array[i] & src.m_Array[i];
     }
+
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : operator^=
-*   Description: overload of the ^= operator.  Performs a bitwise not
-*                between the source array and this bit array.  Contents of
-*                this bit array will be the result.
+*   Description: overload of the ^= operator.  Performs a bitwise xor
+*                between the source array and this bit array.  This bit
+*                array will contain the result.
 *   Parameters : src - Source bit array
-*   Effects    : Results of bitwise not are stored in this array
-*   Returned   : None
+*   Effects    : Results of bitwise xor are stored in this array
+*   Returned   : Reference to this array after xor
 ***************************************************************************/
-void bit_array_c::operator^=(const bit_array_c &src)
+bit_array_c& bit_array_c::operator^=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
-        return;
+        return *this;
     }
 
     /* XOR array one unsigned char at a time */
@@ -656,23 +715,25 @@ void bit_array_c::operator^=(const bit_array_c &src)
     {
         m_Array[i] = m_Array[i] ^ src.m_Array[i];
     }
+
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : operator|=
 *   Description: overload of the |= operator.  Performs a bitwise or
-*                between the source array and this bit array.  Contents of
-*                this bit array will be the result.
+*                between the source array and this bit array.  This bit
+*                array will contain the result.
 *   Parameters : src - Source bit array
 *   Effects    : Results of bitwise or are stored in this array
-*   Returned   : None
+*   Returned   : Reference to this array after or
 ***************************************************************************/
-void bit_array_c::operator|=(const bit_array_c &src)
+bit_array_c& bit_array_c::operator|=(const bit_array_c &src)
 {
     if (m_NumBits != src.m_NumBits)
     {
         /* don't do assignment with different array sizes */
-        return;
+        return *this;
     }
 
     /* OR array one unsigned char at a time */
@@ -680,17 +741,19 @@ void bit_array_c::operator|=(const bit_array_c &src)
     {
         m_Array[i] = m_Array[i] | src.m_Array[i];
     }
+
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : Not
-*   Description: Negates all non-spare bits in bit array
+*   Description: Negates all non-spare bits in bit array.
 *   Parameters : None
 *   Effects    : Contents of bit array are negated.  Any spare bits are
 *                left at 0.
-*   Returned   : None
+*   Returned   : Reference to this array after not
 ***************************************************************************/
-void bit_array_c::Not(void)
+bit_array_c& bit_array_c::Not(void)
 {
     int bits;
     unsigned char mask;
@@ -698,7 +761,7 @@ void bit_array_c::Not(void)
     if (m_Array.size() == 0)
     {
         /* don't do not with unallocated array */
-        return;
+        return *this;
     }
 
     /* NOT array one unsigned char at a time */
@@ -714,29 +777,28 @@ void bit_array_c::Not(void)
         mask = UCHAR_MAX << (CHAR_BIT - bits);
         m_Array[BIT_CHAR(m_NumBits - 1)] &= mask;
     }
+
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : operator<<=
 *   Description: overload of the <<= operator.  Performs a left shift on
-*                this bit array.  Contents of this bit array will be the
-*                result.
+*                this bit array.  This bit array will contain the result.
 *   Parameters : shifts - number of bit positions to shift
 *   Effects    : Results of the shifts are stored in this array
-*   Returned   : None
+*   Returned   : Reference to this array after shift
 ***************************************************************************/
-void bit_array_c::operator<<=(unsigned int shifts)
+bit_array_c& bit_array_c::operator<<=(const unsigned int shifts)
 {
     unsigned int i;
     int chars = shifts / CHAR_BIT; /* number of whole byte shifts */
-
-    shifts = shifts % CHAR_BIT;    /* number of bit shifts remaining */
 
     if (shifts >= m_NumBits)
     {
         /* all bits have been shifted off */
         this->ClearAll();
-        return;
+        return *this;
     }
 
     /* first handle big jumps of bytes */
@@ -755,7 +817,7 @@ void bit_array_c::operator<<=(unsigned int shifts)
     }
 
     /* now we have at most CHAR_BIT - 1 bit shifts across the whole array */
-    for (i = 0; i < shifts; i++)
+    for (i = 0; i < (int)(shifts % CHAR_BIT); i++)
     {
         for (unsigned int j = 0; j < BIT_CHAR(m_NumBits - 1); j++)
         {
@@ -770,30 +832,29 @@ void bit_array_c::operator<<=(unsigned int shifts)
 
         m_Array[BIT_CHAR(m_NumBits - 1)] <<= 1;
     }
+
+    return *this;
 }
 
 /***************************************************************************
 *   Method     : operator>>=
 *   Description: overload of the >>= operator.  Performs a right shift on
-*                this bit array.  Contents of this bit array will be the
-*                result.
+*                this bit array.  This bit array will contain the result.
 *   Parameters : shifts - number of bit positions to shift
 *   Effects    : Results of the shifts are stored in this array
-*   Returned   : None
+*   Returned   : Reference to this array after shift
 ***************************************************************************/
-void bit_array_c::operator>>=(unsigned int shifts)
+bit_array_c& bit_array_c::operator>>=(const unsigned int shifts)
 {
     int i;
     char mask;
     int chars = shifts / CHAR_BIT;  /* number of whole byte shifts */
 
-    shifts = shifts % CHAR_BIT;     /* number of bit shifts remaining */
-
     if (shifts >= m_NumBits)
     {
         /* all bits have been shifted off */
         this->ClearAll();
-        return;
+        return *this;
     }
 
     /* first handle big jumps of bytes */
@@ -812,7 +873,7 @@ void bit_array_c::operator>>=(unsigned int shifts)
     }
 
     /* now we have at most CHAR_BIT - 1 bit shifts across the whole array */
-    for (i = 0; i < (int)shifts; i++)
+    for (i = 0; i < (int)(shifts % CHAR_BIT); i++)
     {
         for (unsigned int j = BIT_CHAR(m_NumBits - 1); j > 0; j--)
         {
@@ -829,8 +890,8 @@ void bit_array_c::operator>>=(unsigned int shifts)
     }
 
     /***********************************************************************
-    * zero any spare bits that are beyond the end of the bit array so
-    * increment and decrement are consistent.
+    * zero any spare bits that are shifted beyond the end of the bit array
+    * so that increment and decrement are consistent.
     ***********************************************************************/
     i = m_NumBits % CHAR_BIT;
     if (i != 0)
@@ -838,6 +899,8 @@ void bit_array_c::operator>>=(unsigned int shifts)
         mask = UCHAR_MAX << (CHAR_BIT - i);
         m_Array[BIT_CHAR(m_NumBits - 1)] &= mask;
     }
+
+    return *this;
 }
 
 /***************************************************************************
@@ -849,7 +912,8 @@ void bit_array_c::operator>>=(unsigned int shifts)
 *   Effects    : Pointer to bit array and bit index are stored.
 *   Returned   : None
 ***************************************************************************/
-bit_array_index_c::bit_array_index_c(bit_array_c *array, unsigned int index)
+bit_array_index_c::bit_array_index_c(bit_array_c *array,
+    const unsigned int index)
 {
     m_BitArray = array;
     m_Index = index;
@@ -864,7 +928,7 @@ bit_array_index_c::bit_array_index_c(bit_array_c *array, unsigned int index)
 *                source.
 *   Returned   : None
 ***************************************************************************/
-void bit_array_index_c::operator=(bool src)
+void bit_array_index_c::operator=(const bool src)
 {
     if (m_BitArray == NULL)
     {

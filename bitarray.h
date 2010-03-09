@@ -10,8 +10,18 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: bitarray.h,v 1.3 2006/04/30 23:34:07 michael Exp $
+*   $Id: bitarray.h,v 1.4 2007/08/06 05:23:12 michael Exp $
 *   $Log: bitarray.h,v $
+*   Revision 1.4  2007/08/06 05:23:12  michael
+*   Updated for LGPL Version 3.
+*
+*   All methods that don't modify object have been made
+*   const to increase functionality of const bit_array_c.
+*
+*   All assignment operators return a reference to the object being assigned a value so that operator chaining will work.
+*
+*   Added >> and << operators.
+*
 *   Revision 1.3  2006/04/30 23:34:07  michael
 *   Improved performance by incorporating Benjamin Schindler's
 *   <bschindler@student.ethz.ch> changes to pass arguments as a reference.
@@ -26,21 +36,22 @@
 ****************************************************************************
 *
 * Bitarray: An ANSI C++ class for manipulating arbitrary length bit arrays
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit array library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit array library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit array library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 #ifndef BIT_ARRAY_H
@@ -60,10 +71,10 @@ class bit_array_c;
 class bit_array_index_c
 {
     public:
-        bit_array_index_c(bit_array_c *array, unsigned int index);
+        bit_array_index_c(bit_array_c *array, const unsigned int index);
 
         /* assignment */
-        void operator=(bool src);
+        void operator=(const bool src);
 
     private:
         bit_array_c *m_BitArray;        /* array index applies to */
@@ -73,8 +84,9 @@ class bit_array_index_c
 class bit_array_c
 {
     public:
-        bit_array_c(int numBits);
-        bit_array_c(const std::vector<unsigned char> &vect, int numBits);
+        bit_array_c(const int numBits);
+        bit_array_c(const std::vector<unsigned char> &vect,
+            const int numBits);
 
         virtual ~bit_array_c(void);
 
@@ -85,42 +97,45 @@ class bit_array_c
         /* set/clear functions */
         void SetAll(void);
         void ClearAll(void);
-        void SetBit(unsigned int bit);
-        void ClearBit(unsigned int bit);
+        void SetBit(const unsigned int bit);
+        void ClearBit(const unsigned int bit);
 
-        bit_array_index_c operator()(unsigned int bit);
+        bit_array_index_c operator()(const unsigned int bit);
 
         /* boolean operator */
-        bool operator[](unsigned int bit);
-        bool operator==(const bit_array_c &other);
-        bool operator!=(const bit_array_c &other);
-        bool operator<(const bit_array_c &other);
-        bool operator<=(const bit_array_c &other);
-        bool operator>(const bit_array_c &other);
-        bool operator>=(const bit_array_c &other);
+        bool operator[](const unsigned int bit) const;
+        bool operator==(const bit_array_c &other) const;
+        bool operator!=(const bit_array_c &other) const;
+        bool operator<(const bit_array_c &other) const;
+        bool operator<=(const bit_array_c &other) const;
+        bool operator>(const bit_array_c &other) const;
+        bool operator>=(const bit_array_c &other) const;
 
         /* bitwise operators */
-        bit_array_c operator&(const bit_array_c &other);
-        bit_array_c operator^(const bit_array_c &other);
-        bit_array_c operator|(const bit_array_c &other);
-        bit_array_c operator~(void);
+        bit_array_c operator&(const bit_array_c &other) const;
+        bit_array_c operator^(const bit_array_c &other) const;
+        bit_array_c operator|(const bit_array_c &other) const;
+        bit_array_c operator~(void) const;
+
+        bit_array_c operator<<(const unsigned int count) const;
+        bit_array_c operator>>(const unsigned int count) const;
 
         /* increment/decrement */
-        void operator++(void);          /* prefix */
-        void operator++(int dummy);     /* postfix */
-        void operator--(void);          /* prefix */
-        void operator--(int dummy);     /* postfix */
+        bit_array_c& operator++(void);          /* prefix */
+        bit_array_c& operator++(int dummy);     /* postfix */
+        bit_array_c& operator--(void);          /* prefix */
+        bit_array_c& operator--(int dummy);     /* postfix */
 
         /* assignments */
-        void operator=(const bit_array_c &src);
+        bit_array_c& operator=(const bit_array_c &src);
 
-        void operator&=(const bit_array_c &src);
-        void operator^=(const bit_array_c &src);
-        void operator|=(const bit_array_c &src);
-        void Not(void);                 /* negate (~=) */
+        bit_array_c& operator&=(const bit_array_c &src);
+        bit_array_c& operator^=(const bit_array_c &src);
+        bit_array_c& operator|=(const bit_array_c &src);
+        bit_array_c& Not(void);                 /* negate (~=) */
 
-        void operator<<=(unsigned int shifts);
-        void operator>>=(unsigned int shifts);
+        bit_array_c& operator<<=(unsigned const int shifts);
+        bit_array_c& operator>>=(unsigned const int shifts);
 
     protected:
         unsigned int m_NumBits;                 /* number of bits in the array */

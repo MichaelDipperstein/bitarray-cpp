@@ -9,8 +9,13 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.2 2004/08/05 22:17:31 michael Exp $
+*   $Id: sample.cpp,v 1.4 2007/08/06 05:21:00 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.4  2007/08/06 05:21:00  michael
+*   Updated for LGPL Version 3.
+*   Verifies new >> and << functions.
+*   Corrects printed comment for setting bits by array index.
+*
 *   Revision 1.2  2004/08/05 22:17:31  michael
 *   Test new methods.
 *
@@ -20,21 +25,22 @@
 ****************************************************************************
 *
 * Sample: A bit array class sample usage program
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004, 2006-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit array library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit array library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit array library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -395,8 +401,15 @@ int main(int argc, char *argv[])
     ba3 = ba1 & ba2;
     ShowArray("ba3", &ba3);
 
+    cout << endl << "ba3 = ba2 >> 1" << endl;
+    ba3 = ba2 >> 1;
+    ShowArray("ba3", &ba3);
 
-    cout << endl << "ba(0) .. ba(7) = false" << endl;
+    cout << endl << "ba3 = ba1 << 1" << endl;
+    ba3 = ba1 << 1;
+    ShowArray("ba3", &ba3);
+
+    cout << endl << "ba3(0) .. ba3(7) = false" << endl;
     for(i = 0; i < 8; i++)
     {
         ba3(i) = false;
