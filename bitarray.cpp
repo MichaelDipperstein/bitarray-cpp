@@ -39,7 +39,8 @@
 *   All methods that don't modify object have been made
 *   const to increase functionality of const bit_array_c.
 *
-*   All assignment operators return a reference to the object being assigned a value so that operator chaining will work.
+*   All assignment operators return a reference to the object being assigned a
+*   value so that operator chaining will work.
 *
 *   Added >> and << operators.
 *
@@ -82,6 +83,7 @@
 ***************************************************************************/
 #include <iostream>
 #include <climits>
+#include <stdexcept>
 #include "bitarray.h"
 
 using namespace std;
@@ -96,10 +98,10 @@ using namespace std;
 #define CHAR_BIT 8
 #endif
 
-/* position of bit within character */
+/* array index for character containing bit */
 #define BIT_CHAR(bit)         ((bit) / CHAR_BIT)
 
-/* array index for character containing bit */
+/* position of bit within character */
 #define BIT_IN_CHAR(bit)      (1 << (CHAR_BIT - 1 - ((bit)  % CHAR_BIT)))
 
 /* number of characters required to contain number of bits */
@@ -124,6 +126,11 @@ bit_array_c::bit_array_c(const int numBits):
     m_NumBits(numBits)
 {
     int numBytes;
+
+    if (numBits < 1)
+    {
+        throw invalid_argument("Error: Bit Array must have at least 1 bit.");
+    }
 
     numBytes = BITS_TO_CHARS(numBits);
 
@@ -580,11 +587,11 @@ bit_array_c& bit_array_c::operator++(void)
 *   Method     : operator++ (postfix)
 *   Description: overload of the ++ operator.  Increments the contents of
 *                a bit array.  Overflows cause rollover.
-*   Parameters : dumy - needed for postfix increment
+*   Parameters : unnamed int - needed for postfix increment
 *   Effects    : Bit array contents are incremented
 *   Returned   : Reference to this array after increment
 ***************************************************************************/
-bit_array_c& bit_array_c::operator++(int dummy)
+bit_array_c& bit_array_c::operator++(int)
 {
     ++(*this);
     return *this;
@@ -647,11 +654,11 @@ bit_array_c& bit_array_c::operator--(void)
 *   Method     : operator-- (postfix)
 *   Description: overload of the -- operator.  Decrements the contents of
 *                a bit array.  Underflows cause rollover.
-*   Parameters : dumy - needed for postfix decrement
+*   Parameters : unnamed int - needed for postfix decrement
 *   Effects    : Bit array contents are decremented
 *   Returned   : None
 ***************************************************************************/
-bit_array_c& bit_array_c::operator--(int dummy)
+bit_array_c& bit_array_c::operator--(int)
 {
     --(*this);
     return *this;

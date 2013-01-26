@@ -13,7 +13,7 @@
 
 CPP = g++
 LD = g++
-CPPFLAGS = -O2 -Wall -pedantic -c
+CPPFLAGS = -O2 -Wall -Wextra -pedantic -c
 LDFLAGS = -O2 -o
 
 # Treat NT and non-NT windows the same

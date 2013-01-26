@@ -23,7 +23,8 @@
 *   All methods that don't modify object have been made
 *   const to increase functionality of const bit_array_c.
 *
-*   All assignment operators return a reference to the object being assigned a value so that operator chaining will work.
+*   All assignment operators return a reference to the object being assigned a
+*   value so that operator chaining will work.
 *
 *   Added >> and << operators.
 *
@@ -96,7 +97,7 @@ class bit_array_c
 
         void Dump(std::ostream &outStream);
 
-        const unsigned int Size() { return m_NumBits; };
+        unsigned int Size() const { return m_NumBits; };
 
         /* set/clear functions */
         void SetAll(void);
@@ -126,9 +127,9 @@ class bit_array_c
 
         /* increment/decrement */
         bit_array_c& operator++(void);          /* prefix */
-        bit_array_c& operator++(int dummy);     /* postfix */
+        bit_array_c& operator++(int);           /* postfix */
         bit_array_c& operator--(void);          /* prefix */
-        bit_array_c& operator--(int dummy);     /* postfix */
+        bit_array_c& operator--(int);           /* postfix */
 
         /* assignments */
         bit_array_c& operator=(const bit_array_c &src);
