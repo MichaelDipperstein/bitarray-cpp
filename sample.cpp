@@ -31,7 +31,7 @@
 *
 * Sample: A bit array class sample usage program
 * Copyright (C) 2004, 2006-2007, 2010 by
-*       Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
+*       Michael Dipperstein (mdipperstein@gmail.com)
 *
 * This file is part of the bit array library.
 *
