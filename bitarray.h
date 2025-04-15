@@ -92,6 +92,7 @@ class bit_array_c
     public:
         bit_array_c(const int numBits);
         bit_array_c(unsigned char *array, const int numBits);
+        bit_array_c(const bit_array_c& orig);
 
         virtual ~bit_array_c(void);
 
@@ -143,8 +144,8 @@ class bit_array_c
         bit_array_c& operator>>=(unsigned const int shifts);
 
     protected:
-        unsigned int m_NumBits;                 /* number of bits in the array */
-        unsigned char *m_Array;                 /* vector of characters */
+        unsigned int m_NumBits;         /* number of bits in the array */
+        unsigned char *m_Array;         /* array of characters to store bits */
 };
 
 #endif  /* ndef BIT_ARRAY_H */
